@@ -20,9 +20,10 @@ export const categories: Category[] = [
     description: 'Hambúrgueres preparados na hora',
     emoji: '🍔',
     products: [
-      { name: 'X-Burger', description: 'Pão, hambúrguer artesanal, queijo, alface, tomate e molho da casa.', price: 22.9, emoji: '🍔' },
-      { name: 'X-Bacon', description: 'Hambúrguer artesanal, queijo, bacon crocante e molho especial.', price: 27.9, emoji: '🥓' },
-      { name: 'X-Salada', description: 'Pão, hambúrguer, queijo, salada fresca e maionese temperada.', price: 24.9, emoji: '🥪' },
+      { name: 'X-Burguer', description: 'Pão, hambúrguer artesanal, queijo e molho especial da casa.', price: 22.9, emoji: '🍔' },
+      { name: 'X-Salada', description: 'Pão, hambúrguer, queijo, alface, tomate e maionese temperada.', price: 24.9, emoji: '🥪' },
+      { name: 'X-Bacon', description: 'Pão, hambúrguer artesanal, queijo, bacon crocante e molho especial.', price: 27.9, emoji: '🥓' },
+      { name: 'X-Tudo', description: 'Pão, hambúrguer, queijo, bacon, ovo, presunto, salada e molho da casa.', price: 32.9, emoji: '🍔' },
     ],
   },
   {
@@ -32,8 +33,9 @@ export const categories: Category[] = [
     emoji: '🍟',
     products: [
       { name: 'Batata frita', description: 'Porção de batatas fritas crocantes com molho da casa.', price: 18.9, emoji: '🍟' },
-      { name: 'Onion rings', description: 'Anéis de cebola empanados, dourados e crocantes.', price: 21.9, emoji: '🧅' },
-      { name: 'Calabresa acebolada', description: 'Calabresa grelhada com cebola e acompanhamento de pão.', price: 28.9, emoji: '🥘' },
+      { name: 'Iscas de peixe', description: 'Iscas de peixe empanadas, acompanhadas de limão e molho especial.', price: 34.9, emoji: '🐟' },
+      { name: 'Frango a passarinho', description: 'Pedaços de frango temperados, fritos e finalizados com alho.', price: 31.9, emoji: '🍗' },
+      { name: 'Calabresa defumada', description: 'Calabresa defumada grelhada com cebola e acompanhamento de pão.', price: 28.9, emoji: '🥘' },
     ],
   },
   {
@@ -42,9 +44,10 @@ export const categories: Category[] = [
     description: 'Opções geladas para acompanhar',
     emoji: '🥤',
     products: [
-      { name: 'Refrigerante lata', description: 'Escolha o sabor disponível no momento do pedido.', price: 6, emoji: '🥤' },
-      { name: 'Suco natural', description: 'Suco preparado na hora. Consulte os sabores disponíveis.', price: 9, emoji: '🍊' },
-      { name: 'Água mineral', description: 'Garrafa de água mineral sem gás, 500 ml.', price: 4, emoji: '💧' },
+      { name: 'Coca-Cola', description: 'Refrigerante Coca-Cola gelado em lata de 350 ml.', price: 6, emoji: '🥤' },
+      { name: 'Pepsi', description: 'Refrigerante Pepsi gelado em lata de 350 ml.', price: 6, emoji: '🥤' },
+      { name: 'Guaraná', description: 'Refrigerante de guaraná gelado em lata de 350 ml.', price: 6, emoji: '🧉' },
+      { name: 'Fanta', description: 'Refrigerante Fanta gelado em lata de 350 ml.', price: 6, emoji: '🍊' },
     ],
   },
   {
@@ -53,9 +56,10 @@ export const categories: Category[] = [
     description: 'Seu lanche completo com economia',
     emoji: '🥡',
     products: [
-      { name: 'Combo Clássico', description: 'X-Burger, batata frita individual e refrigerante lata.', price: 34.9, emoji: '🍔' },
-      { name: 'Combo Bacon', description: 'X-Bacon, batata frita individual e refrigerante lata.', price: 39.9, emoji: '🍟' },
-      { name: 'Combo Duplo', description: 'Dois X-Burgers, porção média de fritas e dois refrigerantes.', price: 64.9, emoji: '🥡' },
+      { name: 'Combo Burguer', description: 'X-Burguer, porção individual de batata frita e Coca-Cola.', price: 38.9, emoji: '🍔' },
+      { name: 'Combo Salada', description: 'X-Salada, porção individual de calabresa defumada e Guaraná.', price: 43.9, emoji: '🥪' },
+      { name: 'Combo Bacon', description: 'X-Bacon, porção individual de frango a passarinho e Pepsi.', price: 47.9, emoji: '🥓' },
+      { name: 'Combo Tudo', description: 'X-Tudo, porção individual de iscas de peixe e Fanta.', price: 52.9, emoji: '🥡' },
     ],
   },
 ];
