@@ -25,11 +25,25 @@ export type CartItem = {
   options?: CartItemOption[];
 };
 
+export type PaymentMethod = '' | 'pix' | 'card' | 'cash';
+export type ChangeOption = '' | 'yes' | 'no';
+
+export type CheckoutDetails = {
+  customerName: string;
+  street: string;
+  houseNumber: string;
+  neighborhood: string;
+  paymentMethod: PaymentMethod;
+  needsChange: ChangeOption;
+  changeFor: string;
+};
+
 type NewCartItem = Omit<CartItem, 'quantity'>;
 
 type CartContextValue = {
   items: CartItem[];
   notes: string;
+  checkoutDetails: CheckoutDetails;
   itemCount: number;
   total: number;
   addItem: (item: NewCartItem) => void;
@@ -37,16 +51,32 @@ type CartContextValue = {
   decreaseItem: (id: string) => void;
   removeItem: (id: string) => void;
   setNotes: (notes: string) => void;
+  updateCheckoutDetails: (details: Partial<CheckoutDetails>) => void;
 };
 
 type CartSnapshot = {
   items: CartItem[];
   notes: string;
+  checkoutDetails: CheckoutDetails;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const EMPTY_CART_SNAPSHOT: CartSnapshot = { items: [], notes: '' };
+const EMPTY_CHECKOUT_DETAILS: CheckoutDetails = {
+  customerName: '',
+  street: '',
+  houseNumber: '',
+  neighborhood: '',
+  paymentMethod: '',
+  needsChange: '',
+  changeFor: '',
+};
+
+const EMPTY_CART_SNAPSHOT: CartSnapshot = {
+  items: [],
+  notes: '',
+  checkoutDetails: EMPTY_CHECKOUT_DETAILS,
+};
 const cartListeners = new Set<() => void>();
 let cartSnapshot = EMPTY_CART_SNAPSHOT;
 let cartInitialized = false;
@@ -61,11 +91,26 @@ function getCartSnapshot() {
           version?: number;
           items?: CartItem[];
           notes?: string;
+          checkoutDetails?: Partial<CheckoutDetails>;
         };
         if (parsedCart.version === 1 && Array.isArray(parsedCart.items)) {
+          const storedDetails = parsedCart.checkoutDetails;
           cartSnapshot = {
             items: parsedCart.items,
             notes: typeof parsedCart.notes === 'string' ? parsedCart.notes : '',
+            checkoutDetails: {
+              customerName: typeof storedDetails?.customerName === 'string' ? storedDetails.customerName : '',
+              street: typeof storedDetails?.street === 'string' ? storedDetails.street : '',
+              houseNumber: typeof storedDetails?.houseNumber === 'string' ? storedDetails.houseNumber : '',
+              neighborhood: typeof storedDetails?.neighborhood === 'string' ? storedDetails.neighborhood : '',
+              paymentMethod: ['pix', 'card', 'cash'].includes(storedDetails?.paymentMethod ?? '')
+                ? storedDetails?.paymentMethod as PaymentMethod
+                : '',
+              needsChange: ['yes', 'no'].includes(storedDetails?.needsChange ?? '')
+                ? storedDetails?.needsChange as ChangeOption
+                : '',
+              changeFor: typeof storedDetails?.changeFor === 'string' ? storedDetails.changeFor : '',
+            },
           };
         }
       }
@@ -101,7 +146,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     getCartSnapshot,
     () => EMPTY_CART_SNAPSHOT,
   );
-  const { items, notes } = snapshot;
+  const { items, notes, checkoutDetails } = snapshot;
 
   const addItem = useCallback((newItem: NewCartItem) => {
     updateCart((currentCart) => {
@@ -153,6 +198,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     updateCart((currentCart) => ({ ...currentCart, notes: newNotes }));
   }, []);
 
+  const updateCheckoutDetails = useCallback((newDetails: Partial<CheckoutDetails>) => {
+    updateCart((currentCart) => ({
+      ...currentCart,
+      checkoutDetails: { ...currentCart.checkoutDetails, ...newDetails },
+    }));
+  }, []);
+
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
   const total = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
@@ -160,6 +212,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => ({
       items,
       notes,
+      checkoutDetails,
       itemCount,
       total,
       addItem,
@@ -167,8 +220,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       decreaseItem,
       removeItem,
       setNotes,
+      updateCheckoutDetails,
     }),
-    [items, notes, itemCount, total, addItem, increaseItem, decreaseItem, removeItem, setNotes],
+    [
+      items,
+      notes,
+      checkoutDetails,
+      itemCount,
+      total,
+      addItem,
+      increaseItem,
+      decreaseItem,
+      removeItem,
+      setNotes,
+      updateCheckoutDetails,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

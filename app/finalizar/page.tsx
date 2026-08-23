@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { useCart } from '../components/cart-provider';
+import { useRouter } from 'next/navigation';
+import {
+  useCart,
+  type PaymentMethod,
+} from '../components/cart-provider';
 import { formatPrice } from '../data/menu';
-
-type PaymentMethod = '' | 'pix' | 'card' | 'cash';
-type ChangeOption = '' | 'yes' | 'no';
 
 const paymentOptions: Array<{
   value: Exclude<PaymentMethod, ''>;
@@ -19,9 +19,31 @@ const paymentOptions: Array<{
 ];
 
 export default function CheckoutPage() {
-  const { total } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('');
-  const [changeOption, setChangeOption] = useState<ChangeOption>('');
+  const router = useRouter();
+  const {
+    items,
+    total,
+    checkoutDetails,
+    updateCheckoutDetails,
+  } = useCart();
+  const {
+    customerName,
+    street,
+    houseNumber,
+    neighborhood,
+    paymentMethod,
+    needsChange,
+    changeFor,
+  } = checkoutDetails;
+
+  const deliveryDataComplete = [customerName, street, houseNumber, neighborhood]
+    .every((value) => value.trim().length > 0);
+  const cashDataComplete = paymentMethod !== 'cash'
+    || (needsChange !== '' && (needsChange === 'no' || changeFor.trim().length > 0));
+  const canProceed = items.length > 0
+    && deliveryDataComplete
+    && paymentMethod !== ''
+    && cashDataComplete;
 
   return (
     <main className="page-shell checkout-page">
@@ -30,12 +52,18 @@ export default function CheckoutPage() {
       </Link>
 
       <section className="checkout-heading" aria-labelledby="checkout-title">
-        <span className="eyebrow">Finalização</span>
+        <span className="eyebrow">Dados do pedido</span>
         <h1 id="checkout-title">Dados para entrega</h1>
         <p>Preencha as informações para que o estabelecimento prepare seu pedido.</p>
       </section>
 
-      <form className="checkout-form" onSubmit={(event) => event.preventDefault()}>
+      <form
+        className="checkout-form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (canProceed) router.push('/resumo');
+        }}
+      >
         <section className="checkout-card" aria-labelledby="delivery-data-title">
           <div className="checkout-card__heading">
             <span aria-hidden="true">1</span>
@@ -53,6 +81,8 @@ export default function CheckoutPage() {
                 name="customerName"
                 autoComplete="name"
                 placeholder="Digite seu nome"
+                value={customerName}
+                onChange={(event) => updateCheckoutDetails({ customerName: event.target.value })}
                 required
               />
             </label>
@@ -65,6 +95,8 @@ export default function CheckoutPage() {
                   name="street"
                   autoComplete="address-line1"
                   placeholder="Nome da rua"
+                  value={street}
+                  onChange={(event) => updateCheckoutDetails({ street: event.target.value })}
                   required
                 />
               </label>
@@ -77,6 +109,8 @@ export default function CheckoutPage() {
                   inputMode="numeric"
                   autoComplete="address-line2"
                   placeholder="Nº"
+                  value={houseNumber}
+                  onChange={(event) => updateCheckoutDetails({ houseNumber: event.target.value })}
                   required
                 />
               </label>
@@ -88,6 +122,8 @@ export default function CheckoutPage() {
                   name="neighborhood"
                   autoComplete="address-level3"
                   placeholder="Nome do bairro"
+                  value={neighborhood}
+                  onChange={(event) => updateCheckoutDetails({ neighborhood: event.target.value })}
                   required
                 />
               </label>
@@ -112,10 +148,12 @@ export default function CheckoutPage() {
                   name="paymentMethod"
                   value={option.value}
                   checked={paymentMethod === option.value}
-                  onChange={() => {
-                    setPaymentMethod(option.value);
-                    if (option.value !== 'cash') setChangeOption('');
-                  }}
+                  onChange={() => updateCheckoutDetails({
+                    paymentMethod: option.value,
+                    ...(option.value === 'cash'
+                      ? {}
+                      : { needsChange: '', changeFor: '' }),
+                  })}
                   required
                 />
                 <span className="payment-option__icon" aria-hidden="true">{option.icon}</span>
@@ -133,8 +171,8 @@ export default function CheckoutPage() {
                     type="radio"
                     name="needsChange"
                     value="no"
-                    checked={changeOption === 'no'}
-                    onChange={() => setChangeOption('no')}
+                    checked={needsChange === 'no'}
+                    onChange={() => updateCheckoutDetails({ needsChange: 'no', changeFor: '' })}
                     required
                   />
                   <span>Não</span>
@@ -144,15 +182,15 @@ export default function CheckoutPage() {
                     type="radio"
                     name="needsChange"
                     value="yes"
-                    checked={changeOption === 'yes'}
-                    onChange={() => setChangeOption('yes')}
+                    checked={needsChange === 'yes'}
+                    onChange={() => updateCheckoutDetails({ needsChange: 'yes' })}
                     required
                   />
                   <span>Sim</span>
                 </label>
               </div>
 
-              {changeOption === 'yes' ? (
+              {needsChange === 'yes' ? (
                 <label className="form-field change-value-field">
                   <span>Troco para quanto?</span>
                   <input
@@ -160,6 +198,8 @@ export default function CheckoutPage() {
                     name="changeFor"
                     inputMode="decimal"
                     placeholder="Ex.: R$ 50,00"
+                    value={changeFor}
+                    onChange={(event) => updateCheckoutDetails({ changeFor: event.target.value })}
                     required
                   />
                 </label>
@@ -168,12 +208,12 @@ export default function CheckoutPage() {
           ) : null}
         </fieldset>
 
-        <section className="checkout-total" aria-label="Total e finalização do pedido">
+        <section className="checkout-total" aria-label="Total e próxima etapa do pedido">
           <div>
             <span>Total do pedido</span>
             <strong>{formatPrice(total)}</strong>
           </div>
-          <button type="button">Finalizar pedido</button>
+          <button type="submit" disabled={!canProceed}>Prosseguir</button>
         </section>
       </form>
     </main>

@@ -112,7 +112,7 @@ export default function CartPage() {
                 <strong>{formatPrice(total)}</strong>
               </div>
               <Link className="checkout-link" href="/finalizar">
-                Finalizar pedido
+                Prosseguir
               </Link>
             </div>
           </aside>
