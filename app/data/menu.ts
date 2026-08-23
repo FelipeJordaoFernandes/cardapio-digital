@@ -4,6 +4,7 @@ export type Product = {
   price: number;
   emoji: string;
   startingAt?: boolean;
+  basePrice?: number;
 };
 
 export type Category = {
@@ -46,6 +47,7 @@ const comboProducts: Product[] = snackProducts.map((snack) => ({
   price: snack.price + lowestPortionPrice + lowestBeveragePrice,
   emoji: snack.emoji,
   startingAt: true,
+  basePrice: snack.price,
 }));
 
 export const categories: Category[] = [

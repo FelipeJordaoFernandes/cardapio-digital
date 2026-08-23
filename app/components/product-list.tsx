@@ -1,0 +1,237 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import type { Category, Product } from '../data/menu';
+import { formatPrice } from '../data/menu';
+import { useCart } from './cart-provider';
+
+type ProductListProps = {
+  category: Category;
+  portionOptions: Product[];
+  beverageOptions: Product[];
+};
+
+type ComboModalProps = {
+  combo: Product;
+  portionOptions: Product[];
+  beverageOptions: Product[];
+  onClose: () => void;
+  onComplete: (portion: Product, beverage: Product) => void;
+};
+
+function createItemId(...parts: string[]) {
+  return parts
+    .join(':')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9:]+/g, '-');
+}
+
+function ComboModal({
+  combo,
+  portionOptions,
+  beverageOptions,
+  onClose,
+  onComplete,
+}: ComboModalProps) {
+  const [step, setStep] = useState<'portion' | 'beverage'>('portion');
+  const [selectedPortion, setSelectedPortion] = useState<Product | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
+
+  const selectPortion = (portion: Product) => {
+    setSelectedPortion(portion);
+    setStep('beverage');
+  };
+
+  return (
+    <div className="modal-backdrop" role="presentation">
+      <section
+        className="combo-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="combo-modal-title"
+      >
+        <div className="combo-modal__handle" aria-hidden="true" />
+        <header className="combo-modal__header">
+          <div>
+            <span className="eyebrow">{step === 'portion' ? 'Etapa 1 de 2' : 'Etapa 2 de 2'}</span>
+            <h2 id="combo-modal-title">
+              {step === 'portion' ? 'Escolha a porção' : 'Escolha a bebida'}
+            </h2>
+            <p>{combo.name}</p>
+          </div>
+          <button
+            className="modal-close"
+            type="button"
+            onClick={onClose}
+            ref={closeButtonRef}
+            aria-label="Fechar personalização"
+          >
+            ×
+          </button>
+        </header>
+
+        {step === 'portion' ? (
+          <div className="choice-list" aria-label="Opções de porção">
+            {portionOptions.map((portion) => (
+              <button
+                className="choice-button"
+                type="button"
+                key={portion.name}
+                onClick={() => selectPortion(portion)}
+              >
+                <span className="choice-button__emoji" aria-hidden="true">{portion.emoji}</span>
+                <span className="choice-button__copy">
+                  <strong>{portion.name}</strong>
+                  <small>{portion.description}</small>
+                </span>
+                <span className="choice-button__price">{formatPrice(portion.price)}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <button className="selection-summary" type="button" onClick={() => setStep('portion')}>
+              <span>
+                <small>Porção escolhida</small>
+                <strong>{selectedPortion?.name}</strong>
+              </span>
+              <span>Alterar</span>
+            </button>
+
+            <div className="choice-list" aria-label="Opções de bebida">
+              {beverageOptions.map((beverage) => (
+                <button
+                  className="choice-button"
+                  type="button"
+                  key={beverage.name}
+                  onClick={() => selectedPortion && onComplete(selectedPortion, beverage)}
+                >
+                  <span className="choice-button__emoji" aria-hidden="true">{beverage.emoji}</span>
+                  <span className="choice-button__copy">
+                    <strong>{beverage.name}</strong>
+                    <small>{beverage.description}</small>
+                  </span>
+                  <span className="choice-button__price">{formatPrice(beverage.price)}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+export function ProductList({ category, portionOptions, beverageOptions }: ProductListProps) {
+  const { addItem } = useCart();
+  const [selectedCombo, setSelectedCombo] = useState<Product | null>(null);
+  const [addedMessage, setAddedMessage] = useState('');
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+  }, []);
+
+  const showAddedMessage = (productName: string) => {
+    setAddedMessage(`${productName} adicionado ao carrinho`);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setAddedMessage(''), 2200);
+  };
+
+  const addRegularProduct = (product: Product) => {
+    addItem({
+      id: createItemId(category.slug, product.name),
+      name: product.name,
+      unitPrice: product.price,
+      emoji: product.emoji,
+    });
+    showAddedMessage(product.name);
+  };
+
+  const addConfiguredCombo = (portion: Product, beverage: Product) => {
+    if (!selectedCombo) return;
+
+    addItem({
+      id: createItemId(category.slug, selectedCombo.name, portion.name, beverage.name),
+      name: selectedCombo.name,
+      unitPrice: (selectedCombo.basePrice ?? 0) + portion.price + beverage.price,
+      emoji: selectedCombo.emoji,
+      options: [
+        { label: 'Porção', value: portion.name },
+        { label: 'Bebida', value: beverage.name },
+      ],
+    });
+    showAddedMessage(selectedCombo.name);
+    setSelectedCombo(null);
+  };
+
+  return (
+    <>
+      <section className="product-list" aria-label={`Produtos de ${category.name}`}>
+        {category.products.map((product) => {
+          const isCombo = category.slug === 'combos';
+          const actionLabel = isCombo
+            ? `Personalizar ${product.name}`
+            : `Adicionar ${product.name} ao carrinho`;
+
+          return (
+            <article className="product-card" key={product.name}>
+              <div className="product-card__content">
+                <h2>{product.name}</h2>
+                <p>{product.description}</p>
+                <strong>
+                  {product.startingAt ? 'A partir de ' : ''}
+                  {formatPrice(product.price)}
+                </strong>
+              </div>
+              <button
+                className="product-card__visual"
+                type="button"
+                onClick={() => isCombo ? setSelectedCombo(product) : addRegularProduct(product)}
+                aria-label={actionLabel}
+              >
+                <span aria-hidden="true">{product.emoji}</span>
+                <span className="product-card__add" aria-hidden="true">+</span>
+              </button>
+            </article>
+          );
+        })}
+      </section>
+
+      {selectedCombo ? (
+        <ComboModal
+          combo={selectedCombo}
+          portionOptions={portionOptions}
+          beverageOptions={beverageOptions}
+          onClose={() => setSelectedCombo(null)}
+          onComplete={addConfiguredCombo}
+        />
+      ) : null}
+
+      {addedMessage ? (
+        <div className="added-toast" role="status" aria-live="polite">
+          <span aria-hidden="true">✓</span>
+          {addedMessage}
+        </div>
+      ) : null}
+    </>
+  );
+}

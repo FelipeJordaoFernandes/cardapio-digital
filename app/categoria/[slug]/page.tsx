@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { categories, findCategory, formatPrice } from '../../data/menu';
+import { ProductList } from '../../components/product-list';
+import { categories, findCategory } from '../../data/menu';
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
@@ -17,6 +18,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   if (!category) {
     notFound();
   }
+
+  const portionOptions = findCategory('porcoes')?.products ?? [];
+  const beverageOptions = findCategory('bebidas')?.products ?? [];
 
   return (
     <main className="page-shell">
@@ -48,24 +52,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         ))}
       </nav>
 
-      <section className="product-list" aria-label={`Produtos de ${category.name}`}>
-        {category.products.map((product) => (
-          <article className="product-card" key={product.name}>
-            <div className="product-card__content">
-              <h2>{product.name}</h2>
-              <p>{product.description}</p>
-              <strong>
-                {product.startingAt ? 'A partir de ' : ''}
-                {formatPrice(product.price)}
-              </strong>
-            </div>
-            <div className="product-card__visual" aria-hidden="true">
-              <span>{product.emoji}</span>
-              <span className="product-card__add">+</span>
-            </div>
-          </article>
-        ))}
-      </section>
+      <ProductList
+        category={category}
+        portionOptions={portionOptions}
+        beverageOptions={beverageOptions}
+      />
     </main>
   );
 }
