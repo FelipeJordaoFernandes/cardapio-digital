@@ -4,6 +4,7 @@ import type {
 } from '../components/cart-provider';
 import { storeConfig } from '../config/store';
 import { formatPrice } from '../data/menu';
+import { formatCurrencyValue } from './currency';
 
 type WhatsAppOrder = {
   items: CartItem[];
@@ -46,6 +47,7 @@ export function buildWhatsAppOrderUrl({
   });
 
   const paymentLine = paymentMethod ? paymentLabels[paymentMethod] : 'Não informado';
+  const formattedChangeFor = formatCurrencyValue(changeFor);
   const messageLines = [
     `*Novo pedido — ${storeConfig.name}*`,
     '',
@@ -63,7 +65,7 @@ export function buildWhatsAppOrderUrl({
   ];
 
   if (paymentMethod === 'cash') {
-    messageLines.push(`*Troco:* ${needsChange === 'yes' ? `Para ${changeFor}` : 'Não precisa'}`);
+    messageLines.push(`*Troco:* ${needsChange === 'yes' ? `Para ${formattedChangeFor}` : 'Não precisa'}`);
   }
 
   messageLines.push('', `*Total do pedido:* ${formatPrice(total)}`);

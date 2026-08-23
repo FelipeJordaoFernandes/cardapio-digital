@@ -8,6 +8,7 @@ import {
   type PaymentMethod,
 } from '../components/cart-provider';
 import { formatPrice } from '../data/menu';
+import { formatCurrencyValue } from '../utils/currency';
 
 const paymentOptions: Array<{
   value: Exclude<PaymentMethod, ''>;
@@ -29,17 +30,6 @@ const paymentGuidance = {
     text: 'O entregador levará a maquininha para realizar o pagamento no local.',
   },
 };
-
-const currencyInputFormatter = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-});
-
-function formatCurrencyInput(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 10);
-  if (!digits) return '';
-  return currencyInputFormatter.format(Number(digits) / 100);
-}
 
 function focusNextField(
   event: KeyboardEvent<HTMLInputElement>,
@@ -260,7 +250,7 @@ export default function CheckoutPage() {
                     placeholder="R$ 0,00"
                     value={changeFor}
                     onChange={(event) => updateCheckoutDetails({
-                      changeFor: formatCurrencyInput(event.target.value),
+                      changeFor: formatCurrencyValue(event.target.value),
                     })}
                     aria-describedby="change-value-hint"
                     required

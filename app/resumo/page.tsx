@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart, type PaymentMethod } from '../components/cart-provider';
 import { formatPrice } from '../data/menu';
+import { formatCurrencyValue } from '../utils/currency';
 import { buildWhatsAppOrderUrl } from '../utils/whatsapp';
 
 const paymentLabels: Record<Exclude<PaymentMethod, ''>, string> = {
@@ -12,6 +14,7 @@ const paymentLabels: Record<Exclude<PaymentMethod, ''>, string> = {
 };
 
 export default function OrderSummaryPage() {
+  const router = useRouter();
   const {
     items,
     notes,
@@ -37,6 +40,7 @@ export default function OrderSummaryPage() {
     && deliveryDataComplete
     && paymentMethod !== ''
     && cashDataComplete;
+  const formattedChangeFor = formatCurrencyValue(changeFor);
 
   function finalizeOrder() {
     if (!orderReady) return;
@@ -48,8 +52,9 @@ export default function OrderSummaryPage() {
       checkoutDetails,
     });
 
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     clearOrder();
-    window.location.assign(whatsappUrl);
+    router.replace('/');
   }
 
   if (!orderReady) {
@@ -137,7 +142,7 @@ export default function OrderSummaryPage() {
             {paymentMethod === 'cash' ? (
               <div>
                 <dt>Troco</dt>
-                <dd>{needsChange === 'yes' ? `Para ${changeFor}` : 'Não precisa'}</dd>
+                <dd>{needsChange === 'yes' ? `Para ${formattedChangeFor}` : 'Não precisa'}</dd>
               </div>
             ) : null}
           </dl>
