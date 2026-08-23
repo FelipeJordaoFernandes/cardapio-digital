@@ -52,6 +52,7 @@ type CartContextValue = {
   removeItem: (id: string) => void;
   setNotes: (notes: string) => void;
   updateCheckoutDetails: (details: Partial<CheckoutDetails>) => void;
+  clearOrder: () => void;
 };
 
 type CartSnapshot = {
@@ -205,6 +206,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const clearOrder = useCallback(() => {
+    updateCart(() => EMPTY_CART_SNAPSHOT);
+  }, []);
+
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
   const total = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
@@ -221,6 +226,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       setNotes,
       updateCheckoutDetails,
+      clearOrder,
     }),
     [
       items,
@@ -234,6 +240,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       setNotes,
       updateCheckoutDetails,
+      clearOrder,
     ],
   );
 

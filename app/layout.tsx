@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist } from 'next/font/google';
 import { CartProvider } from './components/cart-provider';
 import { Header } from './components/header';
+import { storeConfig } from './config/store';
 import './globals.css';
 
 const geist = Geist({
@@ -10,7 +11,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: 'Nome do Estabelecimento | Cardápio digital',
+  title: `${storeConfig.name} | Cardápio digital`,
   description: 'Escolha seus produtos e monte seu pedido de forma rápida.',
 };
 

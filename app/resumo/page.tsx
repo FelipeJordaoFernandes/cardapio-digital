@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCart, type PaymentMethod } from '../components/cart-provider';
 import { formatPrice } from '../data/menu';
+import { buildWhatsAppOrderUrl } from '../utils/whatsapp';
 
 const paymentLabels: Record<Exclude<PaymentMethod, ''>, string> = {
   pix: 'Pix',
@@ -16,6 +17,7 @@ export default function OrderSummaryPage() {
     notes,
     total,
     checkoutDetails,
+    clearOrder,
   } = useCart();
   const {
     customerName,
@@ -35,6 +37,20 @@ export default function OrderSummaryPage() {
     && deliveryDataComplete
     && paymentMethod !== ''
     && cashDataComplete;
+
+  function finalizeOrder() {
+    if (!orderReady) return;
+
+    const whatsappUrl = buildWhatsAppOrderUrl({
+      items,
+      notes,
+      total,
+      checkoutDetails,
+    });
+
+    clearOrder();
+    window.location.assign(whatsappUrl);
+  }
 
   if (!orderReady) {
     return (
@@ -142,7 +158,7 @@ export default function OrderSummaryPage() {
             <span>Total do pedido</span>
             <strong>{formatPrice(total)}</strong>
           </div>
-          <button type="button">Finalizar pedido</button>
+          <button type="button" onClick={finalizeOrder}>Finalizar pedido</button>
         </section>
       </div>
     </main>

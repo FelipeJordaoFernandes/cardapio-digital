@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { storeConfig } from '../config/store';
 import { useCart } from './cart-provider';
 
 export function Header() {
@@ -13,7 +14,7 @@ export function Header() {
         <Link className="brand" href="/" aria-label="Voltar ao início">
           <span className="brand-mark" aria-hidden="true">N</span>
           <span className="brand-copy">
-            <strong>Nome do Estabelecimento</strong>
+            <strong>{storeConfig.name}</strong>
             <small>Cardápio online</small>
           </span>
         </Link>
