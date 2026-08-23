@@ -5,7 +5,16 @@ import { useCart } from '../components/cart-provider';
 import { formatPrice } from '../data/menu';
 
 export default function CartPage() {
-  const { items, itemCount, total, increaseItem, decreaseItem, removeItem } = useCart();
+  const {
+    items,
+    notes,
+    itemCount,
+    total,
+    increaseItem,
+    decreaseItem,
+    removeItem,
+    setNotes,
+  } = useCart();
   const itemLabel = itemCount === 1 ? '1 item' : `${itemCount} itens`;
 
   return (
@@ -84,10 +93,24 @@ export default function CartPage() {
             ))}
           </section>
 
-          <aside className="cart-summary" aria-label="Resumo do carrinho">
-            <div>
-              <span>Subtotal</span>
-              <strong>{formatPrice(total)}</strong>
+          <aside className="cart-sidebar">
+            <section className="order-notes">
+              <label htmlFor="order-notes">Observações do pedido</label>
+              <textarea
+                id="order-notes"
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                placeholder="Ex.: tirar a salada do lanche"
+                maxLength={300}
+                rows={4}
+              />
+            </section>
+
+            <div className="cart-summary" aria-label="Resumo do carrinho">
+              <div>
+                <span>Subtotal</span>
+                <strong>{formatPrice(total)}</strong>
+              </div>
             </div>
           </aside>
         </div>

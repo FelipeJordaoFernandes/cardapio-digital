@@ -219,17 +219,9 @@ export function ProductList({ category, portionOptions, beverageOptions }: Produ
                 </strong>
               </div>
               <div className="product-card__actions">
-                <button
-                  className="product-card__visual"
-                  type="button"
-                  onClick={addAnotherItem}
-                  aria-label={actionLabel}
-                >
-                  <span aria-hidden="true">{product.emoji}</span>
-                  <span className="product-card__add" aria-hidden="true">
-                    {productQuantity > 0 ? '✓' : '+'}
-                  </span>
-                </button>
+                <div className="product-card__visual" aria-hidden="true">
+                  <span>{product.emoji}</span>
+                </div>
 
                 {productQuantity > 0 ? (
                   <div className="menu-quantity-control" aria-label={`Quantidade de ${product.name}`}>
@@ -249,7 +241,16 @@ export function ProductList({ category, portionOptions, beverageOptions }: Produ
                       +
                     </button>
                   </div>
-                ) : null}
+                ) : (
+                  <button
+                    className="product-add-button"
+                    type="button"
+                    onClick={addAnotherItem}
+                    aria-label={actionLabel}
+                  >
+                    Adicionar
+                  </button>
+                )}
               </div>
             </article>
           );

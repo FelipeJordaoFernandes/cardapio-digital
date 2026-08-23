@@ -29,19 +29,26 @@ type NewCartItem = Omit<CartItem, 'quantity'>;
 
 type CartContextValue = {
   items: CartItem[];
+  notes: string;
   itemCount: number;
   total: number;
   addItem: (item: NewCartItem) => void;
   increaseItem: (id: string) => void;
   decreaseItem: (id: string) => void;
   removeItem: (id: string) => void;
+  setNotes: (notes: string) => void;
+};
+
+type CartSnapshot = {
+  items: CartItem[];
+  notes: string;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const EMPTY_CART: CartItem[] = [];
+const EMPTY_CART_SNAPSHOT: CartSnapshot = { items: [], notes: '' };
 const cartListeners = new Set<() => void>();
-let cartItems: CartItem[] = EMPTY_CART;
+let cartSnapshot = EMPTY_CART_SNAPSHOT;
 let cartInitialized = false;
 
 function getCartSnapshot() {
@@ -50,9 +57,16 @@ function getCartSnapshot() {
     try {
       const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
       if (storedCart) {
-        const parsedCart = JSON.parse(storedCart) as { version?: number; items?: CartItem[] };
+        const parsedCart = JSON.parse(storedCart) as {
+          version?: number;
+          items?: CartItem[];
+          notes?: string;
+        };
         if (parsedCart.version === 1 && Array.isArray(parsedCart.items)) {
-          cartItems = parsedCart.items;
+          cartSnapshot = {
+            items: parsedCart.items,
+            notes: typeof parsedCart.notes === 'string' ? parsedCart.notes : '',
+          };
         }
       }
     } catch {
@@ -60,7 +74,7 @@ function getCartSnapshot() {
     }
   }
 
-  return cartItems;
+  return cartSnapshot;
 }
 
 function subscribeToCart(listener: () => void) {
@@ -68,12 +82,12 @@ function subscribeToCart(listener: () => void) {
   return () => cartListeners.delete(listener);
 }
 
-function updateCart(updater: (currentItems: CartItem[]) => CartItem[]) {
-  cartItems = updater(getCartSnapshot());
+function updateCart(updater: (currentCart: CartSnapshot) => CartSnapshot) {
+  cartSnapshot = updater(getCartSnapshot());
   try {
     window.localStorage.setItem(
       CART_STORAGE_KEY,
-      JSON.stringify({ version: 1, items: cartItems }),
+      JSON.stringify({ version: 1, ...cartSnapshot }),
     );
   } catch {
     // O carrinho continua funcionando na sessão quando o armazenamento é bloqueado.
@@ -82,48 +96,79 @@ function updateCart(updater: (currentItems: CartItem[]) => CartItem[]) {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const items = useSyncExternalStore(subscribeToCart, getCartSnapshot, () => EMPTY_CART);
+  const snapshot = useSyncExternalStore(
+    subscribeToCart,
+    getCartSnapshot,
+    () => EMPTY_CART_SNAPSHOT,
+  );
+  const { items, notes } = snapshot;
 
   const addItem = useCallback((newItem: NewCartItem) => {
-    updateCart((currentItems) => {
+    updateCart((currentCart) => {
+      const currentItems = currentCart.items;
       const existingItem = currentItems.find((item) => item.id === newItem.id);
       if (!existingItem) {
-        return [...currentItems, { ...newItem, quantity: 1 }];
+        return {
+          ...currentCart,
+          items: [...currentItems, { ...newItem, quantity: 1 }],
+        };
       }
 
-      return currentItems.map((item) =>
-        item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item,
-      );
+      return {
+        ...currentCart,
+        items: currentItems.map((item) =>
+          item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item,
+        ),
+      };
     });
   }, []);
 
   const increaseItem = useCallback((id: string) => {
-    updateCart((currentItems) =>
-      currentItems.map((item) =>
+    updateCart((currentCart) => ({
+      ...currentCart,
+      items: currentCart.items.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
       ),
-    );
+    }));
   }, []);
 
   const decreaseItem = useCallback((id: string) => {
-    updateCart((currentItems) =>
-      currentItems.flatMap((item) => {
+    updateCart((currentCart) => ({
+      ...currentCart,
+      items: currentCart.items.flatMap((item) => {
         if (item.id !== id) return [item];
         return item.quantity > 1 ? [{ ...item, quantity: item.quantity - 1 }] : [];
       }),
-    );
+    }));
   }, []);
 
   const removeItem = useCallback((id: string) => {
-    updateCart((currentItems) => currentItems.filter((item) => item.id !== id));
+    updateCart((currentCart) => ({
+      ...currentCart,
+      items: currentCart.items.filter((item) => item.id !== id),
+    }));
+  }, []);
+
+  const setNotes = useCallback((newNotes: string) => {
+    updateCart((currentCart) => ({ ...currentCart, notes: newNotes }));
   }, []);
 
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
   const total = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
   const value = useMemo(
-    () => ({ items, itemCount, total, addItem, increaseItem, decreaseItem, removeItem }),
-    [items, itemCount, total, addItem, increaseItem, decreaseItem, removeItem],
+    () => ({
+      items,
+      notes,
+      itemCount,
+      total,
+      addItem,
+      increaseItem,
+      decreaseItem,
+      removeItem,
+      setNotes,
+    }),
+    [items, notes, itemCount, total, addItem, increaseItem, decreaseItem, removeItem, setNotes],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
