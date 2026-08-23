@@ -933,6 +933,34 @@ a:focus-visible {
 
 .payment-option__icon { font-size: 28px; line-height: 1; }
 
+.payment-guidance {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-top: 17px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  animation: cash-details-in 180ms ease-out both;
+}
+
+.payment-guidance > span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--brand-soft);
+  font-size: 17px;
+}
+
+.payment-guidance p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .cash-details {
   margin-top: 17px;
   border-top: 1px solid var(--border);
@@ -1193,4 +1221,5 @@ a:focus-visible {
   * { transition: none !important; }
   .added-toast { animation: none !important; }
   .cash-details { animation: none !important; }
+  .payment-guidance { animation: none !important; }
 }

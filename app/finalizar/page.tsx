@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRef, type KeyboardEvent, type RefObject } from 'react';
 import {
   useCart,
   type PaymentMethod,
@@ -18,8 +19,31 @@ const paymentOptions: Array<{
   { value: 'cash', label: 'Dinheiro', icon: '💵' },
 ];
 
+const paymentGuidance = {
+  pix: {
+    icon: '💬',
+    text: 'O estabelecimento lhe enviará pelo WhatsApp o código Pix.',
+  },
+  card: {
+    icon: '🚚',
+    text: 'O entregador levará a maquininha para realizar o pagamento no local.',
+  },
+};
+
+function focusNextField(
+  event: KeyboardEvent<HTMLInputElement>,
+  nextField: RefObject<HTMLInputElement | null>,
+) {
+  if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+  event.preventDefault();
+  nextField.current?.focus();
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
+  const streetInputRef = useRef<HTMLInputElement>(null);
+  const numberInputRef = useRef<HTMLInputElement>(null);
+  const neighborhoodInputRef = useRef<HTMLInputElement>(null);
   const {
     items,
     total,
@@ -44,6 +68,9 @@ export default function CheckoutPage() {
     && deliveryDataComplete
     && paymentMethod !== ''
     && cashDataComplete;
+  const guidance = paymentMethod === 'pix' || paymentMethod === 'card'
+    ? paymentGuidance[paymentMethod]
+    : null;
 
   return (
     <main className="page-shell checkout-page">
@@ -83,6 +110,8 @@ export default function CheckoutPage() {
                 placeholder="Digite seu nome"
                 value={customerName}
                 onChange={(event) => updateCheckoutDetails({ customerName: event.target.value })}
+                onKeyDown={(event) => focusNextField(event, streetInputRef)}
+                enterKeyHint="next"
                 required
               />
             </label>
@@ -97,6 +126,9 @@ export default function CheckoutPage() {
                   placeholder="Nome da rua"
                   value={street}
                   onChange={(event) => updateCheckoutDetails({ street: event.target.value })}
+                  onKeyDown={(event) => focusNextField(event, numberInputRef)}
+                  enterKeyHint="next"
+                  ref={streetInputRef}
                   required
                 />
               </label>
@@ -111,6 +143,9 @@ export default function CheckoutPage() {
                   placeholder="Nº"
                   value={houseNumber}
                   onChange={(event) => updateCheckoutDetails({ houseNumber: event.target.value })}
+                  onKeyDown={(event) => focusNextField(event, neighborhoodInputRef)}
+                  enterKeyHint="next"
+                  ref={numberInputRef}
                   required
                 />
               </label>
@@ -124,6 +159,13 @@ export default function CheckoutPage() {
                   placeholder="Nome do bairro"
                   value={neighborhood}
                   onChange={(event) => updateCheckoutDetails({ neighborhood: event.target.value })}
+                  onKeyDown={(event) => {
+                    if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+                    event.preventDefault();
+                    event.currentTarget.blur();
+                  }}
+                  enterKeyHint="done"
+                  ref={neighborhoodInputRef}
                   required
                 />
               </label>
@@ -161,6 +203,13 @@ export default function CheckoutPage() {
               </label>
             ))}
           </div>
+
+          {guidance ? (
+            <div className="payment-guidance" role="note">
+              <span aria-hidden="true">{guidance.icon}</span>
+              <p>{guidance.text}</p>
+            </div>
+          ) : null}
 
           {paymentMethod === 'cash' ? (
             <div className="cash-details">
