@@ -11,7 +11,7 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link className="brand" href="/" aria-label="Voltar ao início">
+        <Link className="brand" href="/">
           <span className="brand-mark" aria-hidden="true">N</span>
           <span className="brand-copy">
             <strong>{storeConfig.name}</strong>

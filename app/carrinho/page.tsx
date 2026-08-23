@@ -18,7 +18,7 @@ export default function CartPage() {
   const itemLabel = itemCount === 1 ? '1 item' : `${itemCount} itens`;
 
   return (
-    <main className="page-shell cart-page">
+    <main className="page-shell cart-page" id="main-content" tabIndex={-1}>
       <Link className="back-link" href="/">
         <span aria-hidden="true">←</span> Continuar comprando
       </Link>
@@ -69,7 +69,11 @@ export default function CartPage() {
                   ) : null}
 
                   <div className="cart-item__footer">
-                    <div className="quantity-control" aria-label={`Quantidade de ${item.name}`}>
+                    <div
+                      className="quantity-control"
+                      role="group"
+                      aria-label={`Quantidade de ${item.name}`}
+                    >
                       <button
                         type="button"
                         onClick={() => decreaseItem(item.id)}

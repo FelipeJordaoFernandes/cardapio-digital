@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductList } from '../../components/product-list';
+import { storeConfig } from '../../config/store';
 import { categories, findCategory } from '../../data/menu';
 
 type CategoryPageProps = {
@@ -9,6 +11,29 @@ type CategoryPageProps = {
 
 export function generateStaticParams() {
   return categories.map((category) => ({ slug: category.slug }));
+}
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const category = findCategory(slug);
+
+  if (!category) return {};
+
+  const title = category.name;
+  const description = `${category.description}. Veja as opções e monte seu pedido online.`;
+  const url = `/categoria/${category.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${title} | ${storeConfig.name}`,
+      description,
+      url,
+    },
+    twitter: { title: `${title} | ${storeConfig.name}`, description },
+  };
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
@@ -23,7 +48,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const beverageOptions = findCategory('bebidas')?.products ?? [];
 
   return (
-    <main className="page-shell">
+    <main className="page-shell" id="main-content" tabIndex={-1}>
       <Link className="back-link" href="/">
         <span aria-hidden="true">←</span> Voltar ao menu
       </Link>

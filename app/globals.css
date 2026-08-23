@@ -24,6 +24,23 @@ body {
 a { color: inherit; text-decoration: none; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
+.skip-link {
+  position: fixed;
+  z-index: 200;
+  top: 8px;
+  left: 8px;
+  transform: translateY(-150%);
+  border-radius: 10px;
+  background: var(--ink);
+  padding: 10px 14px;
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  transition: transform 140ms ease;
+}
+
+.skip-link:focus { transform: translateY(0); }
+
 button:focus-visible,
 a:focus-visible {
   outline: 3px solid rgb(231 68 35 / 32%);
@@ -65,7 +82,7 @@ a:focus-visible {
   flex: 0 0 40px;
   place-items: center;
   border-radius: 13px;
-  background: var(--brand);
+  background: var(--brand-dark);
   box-shadow: 0 7px 16px rgb(231 68 35 / 24%);
   color: white;
   font-size: 18px;
@@ -109,7 +126,7 @@ a:focus-visible {
   height: 24px;
   place-items: center;
   border-radius: 999px;
-  background: var(--brand);
+  background: var(--brand-dark);
   font-size: 11px;
 }
 
@@ -118,7 +135,10 @@ a:focus-visible {
   min-height: 100vh;
   margin-inline: auto;
   padding: 108px 0 56px;
+  scroll-margin-top: 92px;
 }
+
+.page-shell:focus { outline: none; }
 
 .hero { max-width: 650px; padding: 22px 0 32px; }
 
@@ -614,7 +634,7 @@ a:focus-visible {
   align-items: center;
   margin-top: 20px;
   border-radius: 14px;
-  background: var(--brand);
+  background: var(--brand-dark);
   padding: 10px 18px;
   color: white;
   font-size: 13px;
@@ -771,14 +791,14 @@ a:focus-visible {
   justify-content: center;
   margin-top: 16px;
   border-radius: 13px;
-  background: var(--brand);
+  background: var(--brand-dark);
   color: white;
   font-size: 13px;
   font-weight: 850;
   transition: background 150ms ease, transform 150ms ease;
 }
 
-.checkout-link:hover { background: #f25736; }
+.checkout-link:hover { background: #8f210d; }
 .checkout-link:active { transform: scale(0.985); }
 
 .checkout-page { width: min(100% - 32px, 760px); }
@@ -921,6 +941,12 @@ a:focus-visible {
   box-shadow: inset 0 0 0 1px var(--brand);
 }
 
+.payment-option:has(input:focus-visible),
+.change-options label:has(input:focus-visible) {
+  outline: 3px solid rgb(231 68 35 / 32%);
+  outline-offset: 3px;
+}
+
 .payment-option input {
   position: absolute;
   top: 9px;
@@ -1011,7 +1037,7 @@ a:focus-visible {
   margin-top: 16px;
   border: 0;
   border-radius: 13px;
-  background: var(--brand);
+  background: var(--brand-dark);
   color: white;
   font: inherit;
   font-size: 13px;
@@ -1020,7 +1046,7 @@ a:focus-visible {
   transition: background 150ms ease, transform 150ms ease;
 }
 
-.checkout-total button:hover { background: #f25736; }
+.checkout-total button:hover { background: #8f210d; }
 .checkout-total button:active { transform: scale(0.985); }
 
 .checkout-total button:disabled {
@@ -1169,7 +1195,7 @@ a:focus-visible {
   margin-top: 16px;
   border: 0;
   border-radius: 13px;
-  background: var(--brand);
+  background: var(--brand-dark);
   color: white;
   font: inherit;
   font-size: 13px;
@@ -1178,7 +1204,7 @@ a:focus-visible {
   transition: background 150ms ease, transform 150ms ease;
 }
 
-.final-order-card button:hover { background: #f25736; }
+.final-order-card button:hover { background: #8f210d; }
 .final-order-card button:active { transform: scale(0.985); }
 
 @media (min-width: 640px) {

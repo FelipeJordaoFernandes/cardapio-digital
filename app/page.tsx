@@ -3,7 +3,7 @@ import { categories } from './data/menu';
 
 export default function Home() {
   return (
-    <main className="page-shell">
+    <main className="page-shell" id="main-content" tabIndex={-1}>
       <section className="hero" aria-labelledby="page-title">
         <span className="eyebrow">Cardápio digital</span>
         <h1 id="page-title">O que você quer pedir hoje?</h1>
@@ -25,7 +25,6 @@ export default function Home() {
               className={`category-card category-card--${category.slug}`}
               href={`/categoria/${category.slug}`}
               key={category.slug}
-              aria-label={`Ver produtos de ${category.name}`}
             >
               <span className="category-card__content">
                 <span className="category-card__label">Ver opções</span>

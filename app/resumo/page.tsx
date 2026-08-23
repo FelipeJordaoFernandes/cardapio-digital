@@ -54,7 +54,7 @@ export default function OrderSummaryPage() {
 
   if (!orderReady) {
     return (
-      <main className="page-shell summary-page">
+      <main className="page-shell summary-page" id="main-content" tabIndex={-1}>
         <Link className="back-link" href="/finalizar">
           <span aria-hidden="true">←</span> Voltar aos dados
         </Link>
@@ -69,7 +69,7 @@ export default function OrderSummaryPage() {
   }
 
   return (
-    <main className="page-shell summary-page">
+    <main className="page-shell summary-page" id="main-content" tabIndex={-1}>
       <Link className="back-link" href="/finalizar">
         <span aria-hidden="true">←</span> Editar dados
       </Link>

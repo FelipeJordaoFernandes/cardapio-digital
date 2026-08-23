@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
 import { CartProvider } from './components/cart-provider';
 import { Header } from './components/header';
@@ -11,8 +11,33 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: `${storeConfig.name} | Cardápio digital`,
-  description: 'Escolha seus produtos e monte seu pedido de forma rápida.',
+  metadataBase: new URL(storeConfig.siteUrl),
+  title: {
+    default: `${storeConfig.name} | Cardápio digital`,
+    template: `%s | ${storeConfig.name}`,
+  },
+  description: storeConfig.description,
+  applicationName: storeConfig.name,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: '/',
+    siteName: storeConfig.name,
+    title: `${storeConfig.name} | Cardápio digital`,
+    description: storeConfig.description,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${storeConfig.name} | Cardápio digital`,
+    description: storeConfig.description,
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#e74423',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -20,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="pt-BR" data-scroll-behavior="smooth">
       <body className={geist.variable}>
         <CartProvider>
+          <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
           <Header />
           {children}
         </CartProvider>

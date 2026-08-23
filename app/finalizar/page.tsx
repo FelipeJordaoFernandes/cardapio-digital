@@ -73,7 +73,7 @@ export default function CheckoutPage() {
     : null;
 
   return (
-    <main className="page-shell checkout-page">
+    <main className="page-shell checkout-page" id="main-content" tabIndex={-1}>
       <Link className="back-link" href="/carrinho">
         <span aria-hidden="true">←</span> Voltar ao carrinho
       </Link>
