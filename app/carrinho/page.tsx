@@ -111,6 +111,9 @@ export default function CartPage() {
                 <span>Subtotal</span>
                 <strong>{formatPrice(total)}</strong>
               </div>
+              <Link className="checkout-link" href="/finalizar">
+                Finalizar pedido
+              </Link>
             </div>
           </aside>
         </div>
