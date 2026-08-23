@@ -93,7 +93,7 @@ a:focus-visible {
 
 .brand-copy strong {
   overflow: hidden;
-  max-width: 46vw;
+  max-width: clamp(70px, 28vw, 120px);
   font-size: 13px;
   line-height: 1.25;
   text-overflow: ellipsis;
@@ -118,7 +118,7 @@ a:focus-visible {
   cursor: pointer;
 }
 
-.cart-button__text { display: none; }
+.cart-button__text { display: inline; }
 
 .cart-count {
   display: grid;
@@ -909,6 +909,12 @@ a:focus-visible {
 .form-field input:focus {
   border-color: var(--brand);
   outline: 3px solid rgb(231 68 35 / 12%);
+}
+
+.field-hint {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
 }
 
 .payment-card { padding-top: 18px; }

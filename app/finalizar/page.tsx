@@ -30,6 +30,17 @@ const paymentGuidance = {
   },
 };
 
+const currencyInputFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
+function formatCurrencyInput(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (!digits) return '';
+  return currencyInputFormatter.format(Number(digits) / 100);
+}
+
 function focusNextField(
   event: KeyboardEvent<HTMLInputElement>,
   nextField: RefObject<HTMLInputElement | null>,
@@ -245,12 +256,18 @@ export default function CheckoutPage() {
                   <input
                     type="text"
                     name="changeFor"
-                    inputMode="decimal"
-                    placeholder="Ex.: R$ 50,00"
+                    inputMode="numeric"
+                    placeholder="R$ 0,00"
                     value={changeFor}
-                    onChange={(event) => updateCheckoutDetails({ changeFor: event.target.value })}
+                    onChange={(event) => updateCheckoutDetails({
+                      changeFor: formatCurrencyInput(event.target.value),
+                    })}
+                    aria-describedby="change-value-hint"
                     required
                   />
+                  <small className="field-hint" id="change-value-hint">
+                    Digite somente os números. O valor será formatado automaticamente.
+                  </small>
                 </label>
               ) : null}
             </div>
