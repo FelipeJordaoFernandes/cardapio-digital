@@ -54,7 +54,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             <div className="product-card__content">
               <h2>{product.name}</h2>
               <p>{product.description}</p>
-              <strong>{formatPrice(product.price)}</strong>
+              <strong>
+                {product.startingAt ? 'A partir de ' : ''}
+                {formatPrice(product.price)}
+              </strong>
             </div>
             <div className="product-card__visual" aria-hidden="true">
               <span>{product.emoji}</span>
