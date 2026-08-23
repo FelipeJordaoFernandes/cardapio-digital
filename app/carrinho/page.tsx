@@ -89,7 +89,6 @@ export default function CartPage() {
               <span>Subtotal</span>
               <strong>{formatPrice(total)}</strong>
             </div>
-            <p>Taxa de entrega e dados do pedido serão definidos na próxima etapa.</p>
           </aside>
         </div>
       )}

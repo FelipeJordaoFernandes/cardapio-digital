@@ -141,19 +141,24 @@ function ComboModal({
 }
 
 export function ProductList({ category, portionOptions, beverageOptions }: ProductListProps) {
-  const { addItem } = useCart();
+  const { items, addItem, decreaseItem } = useCart();
   const [selectedCombo, setSelectedCombo] = useState<Product | null>(null);
-  const [addedMessage, setAddedMessage] = useState('');
+  const [addedNotice, setAddedNotice] = useState<{ id: number; message: string } | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const noticeIdRef = useRef(0);
 
   useEffect(() => () => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
   }, []);
 
   const showAddedMessage = (productName: string) => {
-    setAddedMessage(`${productName} adicionado ao carrinho`);
+    noticeIdRef.current += 1;
+    setAddedNotice({
+      id: noticeIdRef.current,
+      message: `${productName} adicionado ao carrinho`,
+    });
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = setTimeout(() => setAddedMessage(''), 2200);
+    toastTimerRef.current = setTimeout(() => setAddedNotice(null), 2200);
   };
 
   const addRegularProduct = (product: Product) => {
@@ -188,9 +193,20 @@ export function ProductList({ category, portionOptions, beverageOptions }: Produ
       <section className="product-list" aria-label={`Produtos de ${category.name}`}>
         {category.products.map((product) => {
           const isCombo = category.slug === 'combos';
+          const productId = createItemId(category.slug, product.name);
+          const matchingItems = items.filter((item) =>
+            isCombo ? item.id.startsWith(`${productId}:`) : item.id === productId,
+          );
+          const productQuantity = matchingItems.reduce(
+            (quantity, item) => quantity + item.quantity,
+            0,
+          );
+          const itemToDecrease = matchingItems[matchingItems.length - 1];
           const actionLabel = isCombo
             ? `Personalizar ${product.name}`
             : `Adicionar ${product.name} ao carrinho`;
+          const addAnotherItem = () =>
+            isCombo ? setSelectedCombo(product) : addRegularProduct(product);
 
           return (
             <article className="product-card" key={product.name}>
@@ -202,15 +218,39 @@ export function ProductList({ category, portionOptions, beverageOptions }: Produ
                   {formatPrice(product.price)}
                 </strong>
               </div>
-              <button
-                className="product-card__visual"
-                type="button"
-                onClick={() => isCombo ? setSelectedCombo(product) : addRegularProduct(product)}
-                aria-label={actionLabel}
-              >
-                <span aria-hidden="true">{product.emoji}</span>
-                <span className="product-card__add" aria-hidden="true">+</span>
-              </button>
+              <div className="product-card__actions">
+                <button
+                  className="product-card__visual"
+                  type="button"
+                  onClick={addAnotherItem}
+                  aria-label={actionLabel}
+                >
+                  <span aria-hidden="true">{product.emoji}</span>
+                  <span className="product-card__add" aria-hidden="true">
+                    {productQuantity > 0 ? '✓' : '+'}
+                  </span>
+                </button>
+
+                {productQuantity > 0 ? (
+                  <div className="menu-quantity-control" aria-label={`Quantidade de ${product.name}`}>
+                    <button
+                      type="button"
+                      onClick={() => itemToDecrease && decreaseItem(itemToDecrease.id)}
+                      aria-label={`Diminuir quantidade de ${product.name}`}
+                    >
+                      −
+                    </button>
+                    <span aria-live="polite">{productQuantity}</span>
+                    <button
+                      type="button"
+                      onClick={addAnotherItem}
+                      aria-label={`Adicionar mais uma unidade de ${product.name}`}
+                    >
+                      +
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </article>
           );
         })}
@@ -226,10 +266,10 @@ export function ProductList({ category, portionOptions, beverageOptions }: Produ
         />
       ) : null}
 
-      {addedMessage ? (
-        <div className="added-toast" role="status" aria-live="polite">
+      {addedNotice ? (
+        <div className="added-toast" role="status" aria-live="polite" key={addedNotice.id}>
           <span aria-hidden="true">✓</span>
-          {addedMessage}
+          {addedNotice.message}
         </div>
       ) : null}
     </>
