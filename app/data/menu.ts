@@ -26,6 +26,17 @@ export const categories: Category[] = [
     ],
   },
   {
+    slug: 'porcoes',
+    name: 'Porções',
+    description: 'Petiscos para dividir ou aproveitar sozinho',
+    emoji: '🍟',
+    products: [
+      { name: 'Batata frita', description: 'Porção de batatas fritas crocantes com molho da casa.', price: 18.9, emoji: '🍟' },
+      { name: 'Onion rings', description: 'Anéis de cebola empanados, dourados e crocantes.', price: 21.9, emoji: '🧅' },
+      { name: 'Calabresa acebolada', description: 'Calabresa grelhada com cebola e acompanhamento de pão.', price: 28.9, emoji: '🥘' },
+    ],
+  },
+  {
     slug: 'bebidas',
     name: 'Bebidas',
     description: 'Opções geladas para acompanhar',
@@ -40,7 +51,7 @@ export const categories: Category[] = [
     slug: 'combos',
     name: 'Combos',
     description: 'Seu lanche completo com economia',
-    emoji: '🍟',
+    emoji: '🥡',
     products: [
       { name: 'Combo Clássico', description: 'X-Burger, batata frita individual e refrigerante lata.', price: 34.9, emoji: '🍔' },
       { name: 'Combo Bacon', description: 'X-Bacon, batata frita individual e refrigerante lata.', price: 39.9, emoji: '🍟' },
