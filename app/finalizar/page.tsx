@@ -23,7 +23,7 @@ const paymentOptions: Array<{
 const paymentGuidance = {
   pix: {
     icon: '💬',
-    text: 'O estabelecimento lhe enviará pelo WhatsApp o código Pix.',
+    text: 'O estabelecimento informará o código Pix para realizar o pagamento.',
   },
   card: {
     icon: '🚚',

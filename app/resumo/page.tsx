@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useCart, type PaymentMethod } from '../components/cart-provider';
 import { formatPrice } from '../data/menu';
 import { formatCurrencyValue } from '../utils/currency';
-import { buildWhatsAppOrderUrl } from '../utils/whatsapp';
 
 const paymentLabels: Record<Exclude<PaymentMethod, ''>, string> = {
   pix: 'Pix',
@@ -46,14 +45,6 @@ export default function OrderSummaryPage() {
   function finalizeOrder() {
     if (!orderReady) return;
 
-    const whatsappUrl = buildWhatsAppOrderUrl({
-      items,
-      notes,
-      total,
-      checkoutDetails,
-    });
-
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     clearOrder();
     router.replace('/');
   }
