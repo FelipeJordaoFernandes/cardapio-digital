@@ -30,6 +30,7 @@ export function buildWhatsAppOrderUrl({
     street,
     houseNumber,
     neighborhood,
+    addressComplement,
     paymentMethod,
     needsChange,
     changeFor,
@@ -59,10 +60,13 @@ export function buildWhatsAppOrderUrl({
     '*Dados para entrega*',
     `*Cliente:* ${customerName}`,
     `*Endereço:* ${street}, ${houseNumber} — ${neighborhood}`,
-    '',
-    '*Pagamento*',
-    `*Forma:* ${paymentLine}`,
   ];
+
+  if (addressComplement.trim()) {
+    messageLines.push(`*Complemento:* ${addressComplement.trim()}`);
+  }
+
+  messageLines.push('', '*Pagamento*', `*Forma:* ${paymentLine}`);
 
   if (paymentMethod === 'cash') {
     messageLines.push(`*Troco:* ${needsChange === 'yes' ? `Para ${formattedChangeFor}` : 'Não precisa'}`);

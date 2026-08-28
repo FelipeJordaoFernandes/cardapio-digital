@@ -45,6 +45,7 @@ export default function CheckoutPage() {
   const streetInputRef = useRef<HTMLInputElement>(null);
   const numberInputRef = useRef<HTMLInputElement>(null);
   const neighborhoodInputRef = useRef<HTMLInputElement>(null);
+  const complementInputRef = useRef<HTMLInputElement>(null);
   const {
     items,
     total,
@@ -56,6 +57,7 @@ export default function CheckoutPage() {
     street,
     houseNumber,
     neighborhood,
+    addressComplement,
     paymentMethod,
     needsChange,
     changeFor,
@@ -140,7 +142,6 @@ export default function CheckoutPage() {
                   type="text"
                   name="houseNumber"
                   inputMode="numeric"
-                  autoComplete="address-line2"
                   placeholder="Nº"
                   value={houseNumber}
                   onChange={(event) => updateCheckoutDetails({ houseNumber: event.target.value })}
@@ -160,14 +161,29 @@ export default function CheckoutPage() {
                   placeholder="Nome do bairro"
                   value={neighborhood}
                   onChange={(event) => updateCheckoutDetails({ neighborhood: event.target.value })}
+                  onKeyDown={(event) => focusNextField(event, complementInputRef)}
+                  enterKeyHint="next"
+                  ref={neighborhoodInputRef}
+                  required
+                />
+              </label>
+
+              <label className="form-field form-field--complement">
+                <span>Complemento <small>(opcional)</small></span>
+                <input
+                  type="text"
+                  name="addressComplement"
+                  autoComplete="address-line2"
+                  placeholder="Ex.: apto. 12 ou casa dos fundos"
+                  value={addressComplement}
+                  onChange={(event) => updateCheckoutDetails({ addressComplement: event.target.value })}
                   onKeyDown={(event) => {
                     if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
                     event.preventDefault();
                     event.currentTarget.blur();
                   }}
                   enterKeyHint="done"
-                  ref={neighborhoodInputRef}
-                  required
+                  ref={complementInputRef}
                 />
               </label>
             </div>

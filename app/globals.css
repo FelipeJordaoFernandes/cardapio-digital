@@ -878,7 +878,8 @@ a:focus-visible {
 .checkout-fields { display: grid; gap: 13px; }
 .address-fields { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 12px; }
 .form-field--street { min-width: 0; }
-.form-field--neighborhood { grid-column: 1 / -1; }
+.form-field--neighborhood,
+.form-field--complement { grid-column: 1 / -1; }
 
 .form-field {
   display: grid;

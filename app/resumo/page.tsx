@@ -27,6 +27,7 @@ export default function OrderSummaryPage() {
     street,
     houseNumber,
     neighborhood,
+    addressComplement,
     paymentMethod,
     needsChange,
     changeFor,
@@ -126,6 +127,12 @@ export default function OrderSummaryPage() {
               <dt>Endereço</dt>
               <dd>{street}, {houseNumber} — {neighborhood}</dd>
             </div>
+            {addressComplement.trim() ? (
+              <div>
+                <dt>Complemento</dt>
+                <dd>{addressComplement.trim()}</dd>
+              </div>
+            ) : null}
           </dl>
         </section>
 

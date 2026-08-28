@@ -33,6 +33,7 @@ export type CheckoutDetails = {
   street: string;
   houseNumber: string;
   neighborhood: string;
+  addressComplement: string;
   paymentMethod: PaymentMethod;
   needsChange: ChangeOption;
   changeFor: string;
@@ -68,6 +69,7 @@ const EMPTY_CHECKOUT_DETAILS: CheckoutDetails = {
   street: '',
   houseNumber: '',
   neighborhood: '',
+  addressComplement: '',
   paymentMethod: '',
   needsChange: '',
   changeFor: '',
@@ -104,6 +106,9 @@ function getCartSnapshot() {
               street: typeof storedDetails?.street === 'string' ? storedDetails.street : '',
               houseNumber: typeof storedDetails?.houseNumber === 'string' ? storedDetails.houseNumber : '',
               neighborhood: typeof storedDetails?.neighborhood === 'string' ? storedDetails.neighborhood : '',
+              addressComplement: typeof storedDetails?.addressComplement === 'string'
+                ? storedDetails.addressComplement
+                : '',
               paymentMethod: ['pix', 'card', 'cash'].includes(storedDetails?.paymentMethod ?? '')
                 ? storedDetails?.paymentMethod as PaymentMethod
                 : '',
