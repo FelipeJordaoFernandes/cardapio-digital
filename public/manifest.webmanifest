@@ -1,0 +1,18 @@
+{
+  "name": "Nome do Estabelecimento — Cardápio digital",
+  "short_name": "Estabelecimento",
+  "description": "Escolha seus produtos e monte seu pedido de forma rápida pelo cardápio digital.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffaf6",
+  "theme_color": "#e74423",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
