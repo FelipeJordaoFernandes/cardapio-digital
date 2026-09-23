@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /carrinho
+Disallow: /finalizar
+Disallow: /resumo
+
+Sitemap: https://cardapio-digital-five-tau.vercel.app/sitemap.xml
+Host: https://cardapio-digital-five-tau.vercel.app
